@@ -2,7 +2,6 @@
 import React, { ReactNode } from "react";
 import { Container, Grid, Box } from "@mui/material";
 
-// Component chính cho trang đăng nhập
 export default function AuthTemplate({ children }: { children: ReactNode }) {
   return (
     <Box

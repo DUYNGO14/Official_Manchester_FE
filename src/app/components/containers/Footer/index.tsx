@@ -79,7 +79,8 @@ export function Footer() {
         backgroundColor: 'grey.800',
         color: 'white',
         py: 3,
-        mt: 'auto',
+        mt: 3,
+
       }}
     >
       <Container maxWidth="lg">

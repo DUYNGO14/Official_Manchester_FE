@@ -2,7 +2,7 @@ import ServiceService from "./services";
 
 const serverAjax = new ServiceService({
   defaults: {
-    baseURL: process.env.NEXT_PUBLIC_API_URL, // backend API URL
+    baseURL: process.env.CORE_API_DOMAIN, // backend API URL
   },
   prefix: "",
 });

@@ -1,4 +1,4 @@
-import Login from '@/app/components/containers/auth/Login'
+import Login from '@/app/components/containers/Auth/Login'
 import React from 'react'
 
 function PageLogin() {

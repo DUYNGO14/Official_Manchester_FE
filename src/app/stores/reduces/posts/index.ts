@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { IPosts } from "@/app/types/IPosts";
 import { RootState } from "@/app/stores";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -14,8 +15,8 @@ export interface PostState {
   isCallingPage?: boolean;
   isError: boolean;
   error: any;
-  post: any;
-  posts: any[];
+  post: IPosts | null;
+  posts: IPosts[] | null;
   param: any;
   pagination: Pagination | null;
   type: string;
@@ -39,8 +40,6 @@ export const postSlice = createSlice({
   initialState,
   reducers: {
     getPostsAction: (state, action: PayloadAction<any>) => {
-      console.log(action.payload);
-      console.log(action.payload.page);
       if (action.payload.page > 1) {
         state.isCallingPage = true;
         state.isCalling = false;
@@ -130,7 +129,16 @@ const selectState = (state: RootState) => state.posts;
 
 export const makeSelectPosts = createSelector(
   selectState,
-  (state: PostState) => state
+  (state: PostState) => {
+    return {
+      posts: state.posts,
+      isCalling: state.isCalling,
+      isSuccess: state.isSuccess,
+      isError: state.isError,
+      error: state.error,
+      pagination: state.pagination,
+    }
+  }
 );
 export const makeSelectListPosts = createSelector(
   selectState,

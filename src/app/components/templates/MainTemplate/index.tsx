@@ -4,9 +4,9 @@ import { Box, Stack } from "@mui/material";
 
 export default function MainTemplate({ children }: { children: React.ReactNode }) {
   return (
-    <Stack minHeight="100vh">
+    <Stack>
       {/* Header */}
-      <Box component="header" flexShrink={0} sx={{ position: "fixed", top: 0, zIndex: 1 }} >
+      <Box component="header" flexShrink={0} sx={{ position: "fixed", top: 0, zIndex: 1000 }} >
         <Header />
       </Box>
 

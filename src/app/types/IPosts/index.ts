@@ -1,6 +1,6 @@
 export interface IAuthor {
   _id: string;
-  fullname?: string;
+  fullName?: string;
   image?: string;
 }
 

@@ -4,7 +4,7 @@ import { Theme, Components } from '@mui/material/styles';
 const MuiButton: Components<Theme>['MuiButton'] = {
   styleOverrides: {
     root: ({ theme }) => ({
-      borderRadius: "12px", // Base cho tất cả buttons
+      borderRadius: "25px", // Base cho tất cả buttons
       textTransform: "none",
       fontWeight: "600",
       transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -14,7 +14,7 @@ const MuiButton: Components<Theme>['MuiButton'] = {
     containedPrimary: ({ theme }) => ({
       marginTop: theme.spacing(3),
       padding: theme.spacing(2, 4),
-      borderRadius: "16px",
+      borderRadius: "25px",
       fontSize: "16px",
       background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
       color: theme.palette.primary.contrastText,

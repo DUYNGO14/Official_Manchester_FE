@@ -5,15 +5,13 @@ class ClientService extends AxiosCommon {
     super(options);
     this.axiosInstance.interceptors.response.use(
       async (response) => {
-        console.log("Response Interceptor client: ", response.data);
         return {...response.data, code: response.status};
       },
       async function (error) {
-        console.log("Response Interceptor Error client:", error);
         return {
           code: error.response.status ||error.response.data?.code || 500,
-          message: error.response.data?.errors[0].message|| error.response.data?.message || "Request failed",
-          data: error?.response?.data || error?.data || error,
+          message: error.response.data?.message || "Request failed",
+          data: error?.response?.data.errors || error?.data || error,
         };
       }
     );

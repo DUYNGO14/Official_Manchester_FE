@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "@/app/stores";
+import { ref } from "yup";
 export interface AuthState {
   isCalling: boolean;
   isSuccess: boolean;
@@ -125,6 +126,29 @@ export const authSlice = createSlice({
       state.error = action.payload;
       state.type = "verify";
     },
+    refreshTokenAction: (state) => {
+      state.isCalling = true;
+      state.isSuccess = false;
+      state.isError = false;
+      state.error = null;
+      state.param = null;
+      state.type = "refreshToken";
+    },
+    refreshTokenSuccess: (state, action) => {
+      state.isCalling = false;
+      state.isSuccess = true;
+      state.isError = false;
+      state.error = null;
+      state.data = action.payload;
+      state.type = "refreshToken";
+    },
+    refreshTokenError: (state, action) => {
+      state.isCalling = false;
+      state.isSuccess = false;
+      state.isError = true;
+      state.error = action.payload;
+      state.type = "refreshToken";
+    },
   },
 });
 
@@ -141,6 +165,9 @@ export const {
   verifyAction,
   verifySuccess,
   verifyError,
+  refreshTokenAction,
+  refreshTokenSuccess,
+  refreshTokenError,
   reset,
 } = authSlice.actions;
 

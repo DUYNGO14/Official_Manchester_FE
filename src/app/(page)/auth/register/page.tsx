@@ -1,4 +1,4 @@
-import Register from '@/app/components/containers/auth/Register'
+import Register from '@/app/components/containers/Auth/Register'
 import React from 'react'
 
 function PageRegister() {

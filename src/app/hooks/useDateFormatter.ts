@@ -41,7 +41,6 @@ export const useDateFormatter = (options: UseDateFormatterOptions = {}) => {
 
         // Kiểm tra date hợp lệ
         if (!isValid(dateObj)) {
-          console.warn('Invalid date:', date);
           return 'Invalid date';
         }
 
@@ -49,7 +48,6 @@ export const useDateFormatter = (options: UseDateFormatterOptions = {}) => {
           locale: localeMap[locale],
         });
       } catch (error) {
-        console.error('Date formatting error:', error);
         return 'Date error';
       }
     };

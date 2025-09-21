@@ -1,17 +1,16 @@
-import MuiThemeProviders from "@/app/components/providers/MuiProvider";
-import PersistProvider from "@/app/components/providers/PersistProvider";
-import ReduxProviders from "@/app/components/providers/ReducerProvider";
+import UserProfile from "@/app/components/common/UserProfile";
 import Notification from "@/app/components/containers/Notification";
+import MuiThemeProviders from "@/app/components/providers/MuiProvider";
+import ReduxProviders from "@/app/components/providers/ReducerProvider";
 
 export default function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <ReduxProviders>
-      <PersistProvider>
         <MuiThemeProviders>
           <Notification />
+          <UserProfile/>
           {children}
         </MuiThemeProviders>
-      </PersistProvider>
     </ReduxProviders>
   );
 }

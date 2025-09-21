@@ -10,6 +10,19 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  experimental: {
+    globalNotFound: true,
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "res.cloudinary.com",
+        port: "",
+        pathname: "/dmvlywqel/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

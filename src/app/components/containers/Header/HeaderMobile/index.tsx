@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { HeaderProps } from '@/app/components/containers/Header';
+import DropDown from '@/app/components/containers/Header/DropDown';
 import { ROUTE_LIST } from '@/app/components/containers/Header/router';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
@@ -25,8 +26,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 const HeaderMobile = ({
-  token,
   user,
+  isCalling,
   pathname,
   handleLogout
 }: HeaderProps) => {
@@ -117,22 +118,20 @@ const HeaderMobile = ({
             <Divider sx={{ my: 2 }} />
 
             {/* Authentication Section */}
-            {token && user ? (
+            {user && !isCalling ? (
               <>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1, mb: 2 }}>
                   <Avatar
+                    alt={user?.username || 'User'}
+                    src={user?.avatar?.url || './user.png'}
                     sx={{
                       width: 40,
                       height: 40,
-                      bgcolor: 'primary.main',
-                      fontSize: '1rem',
                     }}
-                  >
-                    {user?.username.charAt(0).toUpperCase() || 'U'}
-                  </Avatar>
+                  />
                   <Box>
                     <Typography variant="body1" fontWeight="medium">
-                      {user?.email || 'User'}
+                      {user?.username || 'User'}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {user?.email || 'email'}
@@ -148,39 +147,12 @@ const HeaderMobile = ({
                 >
                   Account Options
                 </Button>
-               
-                  <Button fullWidth variant="outlined" sx={{backgroundColor: 'error.main',  color: 'error.contrastText'}} onClick={handleLogout}>
-                    Logout
-                  </Button>
+                <DropDown anchorEl={anchorEl} handleMenuClose={handleMenuClose} handleLogout={handleLogout} />
+                <Button fullWidth variant="outlined" sx={{ backgroundColor: 'error.main', color: 'error.contrastText' }} onClick={handleLogout}>
+                  Logout
+                </Button>
 
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                  PaperProps={{
-                    elevation: 3,
-                    sx: {
-                      mt: 1,
-                      minWidth: 200,
-                    },
-                  }}
-                >
-                  <MenuItem onClick={() => { handleMenuClose(); setDrawerOpen(false); }}>
-                    <Typography variant="body2">Profile</Typography>
-                  </MenuItem>
-                  <MenuItem onClick={() => { handleMenuClose(); setDrawerOpen(false); }}>
-                    <Typography variant="body2">Dashboard</Typography>
-                  </MenuItem>
-                  <MenuItem onClick={() => { handleMenuClose(); setDrawerOpen(false); }}>
-                    <Typography variant="body2">Settings</Typography>
-                  </MenuItem>
-                  <Divider />
-                  <MenuItem >
-                    <Typography variant="body2" color="error">
-                      Logout
-                    </Typography>
-                  </MenuItem>
-                </Menu>
+
               </>
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -195,7 +167,7 @@ const HeaderMobile = ({
                   >Login</Button>
                 </MuiLink>
 
-                <Link href="/auth/register" passHref style={{ textDecoration: 'none' }}>
+               <MuiLink underline="none" component={Link} href="/auth/register">
                   <Button
                     fullWidth
                     variant="contained"
@@ -205,7 +177,7 @@ const HeaderMobile = ({
                   >
                     Register
                   </Button>
-                </Link>
+                </MuiLink>
               </Box>
             )}
           </Box>

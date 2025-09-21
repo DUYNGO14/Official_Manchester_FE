@@ -1,31 +1,24 @@
-import { Box, Card, Grid, Skeleton } from '@mui/material'
+import { Box, Card, Skeleton } from '@mui/material'
+import Grid from '@mui/material/Grid'
 import React from 'react'
 interface Props {
-  count: number
+  count?: number
 }
-export default function CardPostSkeleton({count = 2}: Props) {
+export default function CardPostSkeleton({count = 5}: Props) {
+  const gridSizes = [
+    { xs: 12, md: 4, lg: 6 },
+    { xs: 12, md: 4, lg: 6 },
+    { xs: 12, md: 4 },
+    { xs: 12, md: 4 },
+    { xs: 12, md: 4 },
+  ];
+
   return (
-    <Grid container spacing={4}>
-          {Array.from(Array(count)).map((_, index) => (
-            <Grid
-              item
-              xs={12}
-              md={6}
-              key={index}
-              sx={{
-                display: 'flex',
-              }}
-            >
-              <Box
-                sx={{
-                  width: '100%',
-                  transition: 'transform 0.2s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-4px)'
-                  }
-                }}
-              >
-                <Card>
+    <Box sx={{ flexGrow: 1 }}>
+      <Grid container spacing={2}>
+        {Array.from(Array(count)).map((_, index) => (
+          <Grid key={index} size={gridSizes[index]}>
+            <Card>
                   <Box>
                     <Skeleton variant="rectangular" height={200} />
                     <Box p={2}>
@@ -36,9 +29,9 @@ export default function CardPostSkeleton({count = 2}: Props) {
                     </Box>
                   </Box>
                 </Card>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-  )
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  );
 }

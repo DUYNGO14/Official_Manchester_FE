@@ -5,7 +5,6 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const res: any = await post("/auth/register", body);
-    console.log("Response register route:", res);
     // ✅ SỬA: Kiểm tra code thay vì data
     if (res?.code >= 400) {
       // Trả về error response từ API
@@ -20,7 +19,6 @@ export async function POST(request: Request) {
     }
     return Response.json(res || {}, { status: 200 });
   } catch (error: any) {
-    console.error("Error login route:", error);
 
     // ✅ Xử lý lỗi khác (network error, etc.)
     return Response.json(

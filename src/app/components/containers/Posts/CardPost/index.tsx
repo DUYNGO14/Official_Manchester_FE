@@ -1,4 +1,5 @@
-import { IPosts } from '@/app/interface/IPosts';
+import useDateFormatter from '@/app/hooks/useDateFormatter';
+import { IAuthor, ICategory, IPosts } from '@/app/types/IPosts';
 import { CalendarToday, Schedule } from '@mui/icons-material';
 import {
   Card,
@@ -14,6 +15,9 @@ import Link from 'next/link';
 const CardPost = ({
   post
 }: { post: IPosts }) => {
+  const user : IAuthor = post.author || {};
+  const category : ICategory = post.category  || {};
+  const fomatDate = useDateFormatter({ locale: 'vi' });
   return (
     <Card
       sx={{
@@ -46,12 +50,11 @@ const CardPost = ({
       />
       <CardContent sx={{ flexGrow: 1, p: 3 }}>
         <Chip
-          label={post.category.name}
+          label={category.name}
           size="small"
           color="primary"
           sx={{ mb: 2, fontWeight: 600 }}
         />
-
         <Link href={`/posts/${post.slug}`}>
           <Typography
             variant="h6"
@@ -84,17 +87,17 @@ const CardPost = ({
           alignItems="center"
           sx={{ mt: 'auto', pt: 2 }}
         >
-          {/* <Stack direction="row" spacing={0.5} alignItems="center">
+          <Stack direction="row" spacing={0.5} alignItems="center">
             <CalendarToday sx={{ fontSize: 18, color: 'text.secondary' }} />
             <Typography variant="caption" color="text.secondary">
-              {post.publishedAt}
+              {fomatDate.shortDate(post.publishedAt)}
             </Typography>
-          </Stack> */}
+          </Stack>
 
           <Stack direction="row" spacing={0.5} alignItems="center">
             <Schedule sx={{ fontSize: 18, color: 'text.secondary' }} />
             <Typography variant="caption" color="text.secondary">
-              {post.views}
+              {user.fullName || 'Admin'}
             </Typography>
           </Stack>
         </Stack>

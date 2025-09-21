@@ -1,29 +1,26 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import CardPost from '@/app/components/containers/Posts/CardPost';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import CardPost from "@/app/components/containers/Posts/CardPost";
+import { IPosts } from "@/app/types/IPosts";
+import { Box } from "@mui/material";
+import Grid from "@mui/material/Grid"; // nếu bạn dùng Grid v2
 
 
+export default function ListPost({ posts }: { posts: IPosts[] }) {
+  const gridSizes = [
+    { xs: 12, md: 4, lg: 6 },
+    { xs: 12, md: 4, lg: 6 },
+    { xs: 12, md: 4 },
+    { xs: 12, md: 4 },
+    { xs: 12, md: 4 },
+  ];
 
-export default function ListPost({posts }: any) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
-        <Grid size={{ xs: 12, md: 4, lg: 6 }}>
-            <CardPost  post={posts[0]}  />
-        </Grid>
-        <Grid size={{ xs: 12, md: 4, lg: 6 }}>
-             <CardPost  post={posts[1]}  />
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-             <CardPost post={posts[2]}  />
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-             <CardPost post={posts[3]} />
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-             <CardPost post={posts[4]} />
-        </Grid>
+        {posts.slice(0, 5).map((post, index) => (
+          <Grid key={post._id || index} size={gridSizes[index]}>
+            <CardPost post={post} />
+          </Grid>
+        ))}
       </Grid>
     </Box>
   );

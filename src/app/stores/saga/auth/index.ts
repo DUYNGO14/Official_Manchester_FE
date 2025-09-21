@@ -1,38 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { post } from "@/app/common/ajax/client";
+import { get, post } from "@/app/common/ajax/client";
+import accessTokenManager from "@/app/common/utils/auth/accessTokenManager";
 import {
   loginAction,
   loginError,
   loginSuccess,
   logoutAction,
   logoutSuccess,
+  refreshTokenAction,
+  refreshTokenError,
+  refreshTokenSuccess,
   registerAction,
   registerError,
   registerSuccess,
   verifyAction,
   verifyError,
-  verifySuccess
+  verifySuccess,
 } from "@/app/stores/reduces/auth";
 import { showNotification } from "@/app/stores/reduces/notification";
-import { LoginPayload, RegisterPayload, VerifyPayload } from "@/app/types/IAuth";
+import {
+  LoginPayload,
+  RegisterPayload,
+  VerifyPayload,
+} from "@/app/types/IAuth";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, takeLatest } from "redux-saga/effects";
-
 function* callApiLogin(
   action: PayloadAction<LoginPayload>
 ): Generator<any, void, unknown> {
   try {
     const payload = action.payload;
     const response: any = yield call(post, "/auth/login", payload);
+    console.log("response saga", response);
     if (response.code >= 200 && response.code < 300) {
-      yield put(loginSuccess(response.data));
+      yield put(loginSuccess(response.data.user));
       yield put(
         showNotification({ message: "Login successfully", severity: "success" })
       );
+      window?.location?.reload();
     } else if (response.code === 422) {
       const errorMessage =
-        response.errors?.[0]?.message ||
-        response.message ||
+       response.message ||
         "Email hoặc mật khẩu không đúng";
       yield put(loginError(errorMessage));
     } else {
@@ -65,19 +73,18 @@ function* callApiRegister(
 ): Generator<any, void, unknown> {
   try {
     const payload = action.payload;
-    console.log("Register payload:", payload);
     const response: any = yield call(post, "/auth/register", payload);
-    console.log("Register response saga:", response);
     if (response.code >= 200 && response.code < 300) {
       yield put(registerSuccess(response.data));
       yield put(
-        showNotification({ message: "Register successfully", severity: "success" })
+        showNotification({
+          message: "Register successfully",
+          severity: "success",
+        })
       );
     } else if (response.code === 422) {
       const errorMessage =
-        response.errors?.[0]?.message ||
-        response.message ||
-        "Đăng kí thất bại";
+        response.errors?.[0]?.message || response.message || "Đăng kí thất bại";
       yield put(registerError(errorMessage));
     } else {
       // Lỗi khác
@@ -104,18 +111,21 @@ function* callApiRegister(
     );
   }
 }
-function* callApiVerify(action: PayloadAction<VerifyPayload>) : Generator<any, void, unknown> {
+function* callApiVerify(
+  action: PayloadAction<VerifyPayload>
+): Generator<any, void, unknown> {
   try {
     const payload = action.payload;
-    console.log("Verify payload saga😀:", payload);
     const response: any = yield call(post, "/auth/verify", payload);
-    console.log("Verify response saga😀 :", response);
     if (response.code >= 200 && response.code < 300) {
       yield put(verifySuccess(response.data));
       yield put(
-        showNotification({ message: "Verify successfully", severity: "success" })
+        showNotification({
+          message: "Verify successfully",
+          severity: "success",
+        })
       );
-    }else{
+    } else {
       yield put(verifyError(response.message || "Verify thất bại"));
     }
   } catch (error) {
@@ -125,44 +135,52 @@ function* callApiVerify(action: PayloadAction<VerifyPayload>) : Generator<any, v
 
 function* callApiLogout(): Generator<any, void, unknown> {
   try {
-    
-    // Gọi thử API logout (revoke refreshToken nếu cần)
     yield call(post, "/auth/logout", {});
-
-    // Dù thành công hay thất bại thì vẫn clear client state
-    yield put(logoutSuccess());
     yield put(
       showNotification({
         message: "Logout successfully",
         severity: "success",
       })
     );
-
-    // Chuyển sang trang login
-    window.location.href = "/auth/login";
   } catch (error: any) {
     console.error("Logout saga error:", error);
-
-    // Dù có lỗi thì vẫn clear để đảm bảo user được logout
-    yield put(logoutSuccess());
     yield put(
       showNotification({
         message: "You have been logged out",
         severity: "info",
       })
     );
-
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-
+  } finally {
+    yield put(logoutSuccess());
     window.location.href = "/auth/login";
   }
 }
 
+function* callApiRefreshToken(): Generator<any, void, unknown> {
+  try {
+    const response: any = yield call(get, "/auth/refresh-token");
+    console.log("response", response);
+    if (response.code >= 200 && response.code < 300) {
+      accessTokenManager.save(response.data.accessToken, response.data.expired_access_token);
+      yield put(refreshTokenSuccess(response.data));
+      yield put(
+        showNotification({
+          message: "Refresh token successfully",
+          severity: "success",
+        })
+      );
+    } else {
+      yield put(refreshTokenError(response.message || "Refresh token thất bại"));
+    }
+  } catch (error) {
+    yield put(refreshTokenError(error));
+  }
+}
 
 export default function* authSaga() {
   yield takeLatest(loginAction.type, callApiLogin);
   yield takeLatest(registerAction.type, callApiRegister);
   yield takeLatest(verifyAction.type, callApiVerify);
   yield takeLatest(logoutAction.type, callApiLogout);
+  yield takeLatest(refreshTokenAction.type, callApiRefreshToken);
 }

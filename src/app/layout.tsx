@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Oswald, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import AppProvider from "@/app/components/providers/AppProvider";
 
-const geistSans = Geist({
+const oswald  = Oswald({
+  subsets: ["latin"],
   variable: "--font-geist-sans",
-  subsets: ["latin"],
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const robotoMono = Roboto_Mono({
   subsets: ["latin"],
+  variable: "--font-geist-mono",
 });
 
 export const metadata: Metadata = {
@@ -25,9 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${oswald.variable} ${robotoMono.variable}`}>
         <AppProvider>{children}</AppProvider>
       </body>
     </html>

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import CardMatch from '@/app/components/containers/matches/CardMatch';
+import CardMatch from '@/app/components/containers/Matches/CardMatch';
 import {
   KeyboardArrowLeft,
   KeyboardArrowRight,

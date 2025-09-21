@@ -12,14 +12,13 @@ export default async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
   try {
-    // Check if the user is authenticated
-    // This is a placeholder; replace with actual authentication logic
     const uCookies = await cookies();
-    const token = uCookies.get("token")?.value || null;
-    if (token && pathname.startsWith(AUTH_GROUP_PAGE)) {
+    const token =uCookies.get(process.env.COOKIE_TOKEN_NAME || "access_token")?.value;
+    const refreshToken = uCookies.get(process.env.COOKIE_REFRESH_TOKEN_NAME || "refresh_token")?.value;
+     if ((token || refreshToken) && pathname.startsWith(AUTH_GROUP_PAGE)) {
       const url = new URL(HOME_PAGE, request.url);
       return NextResponse.redirect(url);
-    } else if (!token && !pathname.startsWith(AUTH_GROUP_PAGE)) {
+    }else if (!token && !refreshToken && !pathname.startsWith(AUTH_GROUP_PAGE)) {
       const signinUrl = new URL(AUTH_SIGNIN_PAGE, request.url);
       signinUrl.searchParams.set("referer", pathname);
       return NextResponse.redirect(signinUrl);
@@ -32,8 +31,5 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Match all pathnames except for
-  // - … if they start with `/api`, `/trpc`, `/_next` or `/_vercel`
-  // - … the ones containing a dot (e.g. `favicon.ico`)
   matcher: "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
 };

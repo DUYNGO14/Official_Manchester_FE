@@ -3,7 +3,7 @@ import { PaletteOptions } from "@mui/material";
 const palette: PaletteOptions = {
   mode: "light",
   primary: {
-    main: '#db1c25',      // Coral Red - màu chủ đạo
+    main: '#c60100',      // Coral Red - màu chủ đạo
     light: '#ff9a9e',     // Lighter coral
     dark: '#ff5252',      // Darker coral
     contrastText: '#ffffff'

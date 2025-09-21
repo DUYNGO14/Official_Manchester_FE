@@ -1,4 +1,4 @@
-import Verify from '@/app/components/containers/auth/verify'
+import Verify from '@/app/components/containers/Auth/verify'
 import React from 'react'
 
 function PageVerify() {

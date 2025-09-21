@@ -17,7 +17,6 @@ const Verify = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const verify = useSelector(makeSelectAuth);
-  console.log("verify", verify);
   const {
     control,
     handleSubmit,
@@ -25,7 +24,7 @@ const Verify = () => {
     setValue
   } = useForm({
     defaultValues: {
-      email: verify?.data?.email,
+      email: verify?.param?.email || "",
       code: "",
     },
     mode: "onChange",

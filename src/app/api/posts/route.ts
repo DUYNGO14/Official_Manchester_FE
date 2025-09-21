@@ -28,13 +28,24 @@ export async function GET(request: Request) {
         { status: response.code }
       );
     }
+    let pagination;
+    if(response.data.limit  && response.data.page && response.data.totalPage && response.data.total) {
+      pagination = null
+    }else{
+      pagination = {
+        limit: response.data.limit,
+        page: response.data.page,
+        totalPage: response.data.totalPage,
+        total: response.data.total
+      }
+    }
 
     return NextResponse.json(
       {
         code: 200,
         message: response.data?.message || "Get matches successfully",
-        data: response.data,
-        pagination: response.pagination || null,
+        data: response.data.data,
+        pagination: pagination,
       },
       { status: 200 }
     );
