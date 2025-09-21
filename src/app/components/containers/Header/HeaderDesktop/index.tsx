@@ -76,59 +76,57 @@ const HeaderDesktop = ({ user, isCalling, pathname, handleLogout }: HeaderProps)
 
           {/* Right side - Auth Buttons / User Menu */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {
-              (!user && isCalling) ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Skeleton variant="circular" width={32} height={32} />
-                  <Skeleton variant="rectangular" width={70} height={20} />
-                </Box>
-              ) :
-                (user && !isCalling) ? (
-                  <>
-                    <Button
-                      onClick={handleMenuOpen}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        textTransform: 'none',
-                        color: 'text.primary',
-                      }}
-                    >
-                      <Avatar
-                        src={user?.avatar?.url || '/user.png'}
-                        alt={user?.username || 'User'}
-                        sx={{
-                          width: 40,
-                          height: 40,
-                        }}
-                      />
-                      <Typography
-                        variant="body2"
-                        sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 'bold', fontSize: '0.875rem' }}
-                      >
-                        {user?.username || 'User'}
-                      </Typography>
-                    </Button>
+            {isCalling ? (
+              // Đang gọi API -> show skeleton
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Skeleton variant="circular" width={32} height={32} />
+                <Skeleton variant="rectangular" width={70} height={20} />
+              </Box>
+            ) : user ? (
+              // Có user -> show menu
+              <>
+                <Button
+                  onClick={handleMenuOpen}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    textTransform: 'none',
+                    color: 'text.primary',
+                  }}
+                >
+                  <Avatar
+                    src={user?.avatar?.url || '/user.png'}
+                    alt={user?.username || 'User'}
+                    sx={{ width: 40, height: 40 }}
+                  />
+                  <Typography
+                    variant="body2"
+                    sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 'bold', fontSize: '0.875rem' }}
+                  >
+                    {user?.username || 'User'}
+                  </Typography>
+                </Button>
+                <DropDown anchorEl={anchorEl} handleMenuClose={handleMenuClose} handleLogout={handleLogout} />
+              </>
+            ) : (
+              // Không có user & không loading -> show Login
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <MuiLink component={Link} href="/auth/login" underline="none">
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      fontWeight: 600,
+                      borderWidth: 2,
+                      '&:hover': { borderWidth: 2 },
+                    }}
+                  >
+                    Login
+                  </Button>
+                </MuiLink>
+              </Box>
+            )}
 
-                    <DropDown anchorEl={anchorEl} handleMenuClose={handleMenuClose} handleLogout={handleLogout} />
-                  </>
-                ) : (
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <MuiLink component={Link} href="/auth/login" underline="none">
-                      <Button
-                        variant="outlined"
-                        sx={{
-                          fontWeight: 600,
-                          borderWidth: 2,
-                          '&:hover': { borderWidth: 2 },
-                        }}
-                      >
-                        Login
-                      </Button>
-                    </MuiLink>
-                  </Box>
-                )}
           </Box>
         </Toolbar>
       </Container>

@@ -15,11 +15,10 @@ import {
   List,
   ListItem,
   ListItemText,
-  Menu,
-  MenuItem,
+  Skeleton,
   Toolbar,
   Typography,
-  Link as MuiLink
+  Link as MuiLink,
 } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -29,7 +28,7 @@ const HeaderMobile = ({
   user,
   isCalling,
   pathname,
-  handleLogout
+  handleLogout,
 }: HeaderProps) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -42,7 +41,6 @@ const HeaderMobile = ({
     setAnchorEl(null);
   };
 
-
   return (
     <AppBar
       elevation={0}
@@ -51,7 +49,7 @@ const HeaderMobile = ({
         color: 'text.primary',
         borderBottom: 1,
         borderColor: 'divider',
-        display: { xs: 'block', md: 'none' }
+        display: { xs: 'block', md: 'none' },
       }}
     >
       <Toolbar sx={{ justifyContent: 'space-between' }}>
@@ -65,7 +63,7 @@ const HeaderMobile = ({
               '&:hover': { color: 'primary.dark' },
             }}
           >
-            <Image src='/logomu.png' alt="Logo" width={50} height={50} />
+            <Image src="/logomu.png" alt="Logo" width={50} height={50} />
           </Typography>
         </Link>
 
@@ -85,11 +83,13 @@ const HeaderMobile = ({
           onClose={() => setDrawerOpen(false)}
           PaperProps={{
             sx: {
-              width: '80%', maxWidth: 300, display: { xs: 'block', md: 'none' },
+              width: '80%',
+              maxWidth: 300,
+              display: { xs: 'block', md: 'none' },
               '& .MuiBackdrop-root': {
-                display: { xs: 'block', md: 'none' }
-              }
-            }
+                display: { xs: 'block', md: 'none' },
+              },
+            },
           }}
         >
           <Box sx={{ p: 2 }}>
@@ -104,7 +104,7 @@ const HeaderMobile = ({
                   sx={{
                     borderRadius: 1,
                     mb: 0.5,
-                    '&:hover': { backgroundColor: 'action.hover' }
+                    '&:hover': { backgroundColor: 'action.hover' },
                   }}
                 >
                   <ListItemText
@@ -118,16 +118,31 @@ const HeaderMobile = ({
             <Divider sx={{ my: 2 }} />
 
             {/* Authentication Section */}
-            {user && !isCalling ? (
+            {isCalling ? (
+              // Loading user -> Skeleton
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 1 }}>
+                <Skeleton variant="circular" width={40} height={40} />
+                <Box sx={{ flex: 1 }}>
+                  <Skeleton variant="text" width="60%" />
+                  <Skeleton variant="text" width="80%" />
+                </Box>
+              </Box>
+            ) : user ? (
+              // Logged in -> Show user
               <>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1, mb: 2 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    p: 1,
+                    mb: 2,
+                  }}
+                >
                   <Avatar
                     alt={user?.username || 'User'}
                     src={user?.avatar?.url || './user.png'}
-                    sx={{
-                      width: 40,
-                      height: 40,
-                    }}
+                    sx={{ width: 40, height: 40 }}
                   />
                   <Box>
                     <Typography variant="body1" fontWeight="medium">
@@ -147,34 +162,34 @@ const HeaderMobile = ({
                 >
                   Account Options
                 </Button>
-                <DropDown anchorEl={anchorEl} handleMenuClose={handleMenuClose} handleLogout={handleLogout} />
-                <Button fullWidth variant="outlined" sx={{ backgroundColor: 'error.main', color: 'error.contrastText' }} onClick={handleLogout}>
+                <DropDown
+                  anchorEl={anchorEl}
+                  handleMenuClose={handleMenuClose}
+                  handleLogout={handleLogout}
+                />
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  sx={{
+                    backgroundColor: 'error.main',
+                    color: 'error.contrastText',
+                  }}
+                  onClick={handleLogout}
+                >
                   Logout
                 </Button>
-
-
               </>
             ) : (
+              // Not logged in
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-
                 <MuiLink underline="none" component={Link} href="/auth/login">
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{
-                      fontWeight: 600,
-                    }}
-                  >Login</Button>
+                  <Button fullWidth variant="contained" sx={{ fontWeight: 600 }}>
+                    Login
+                  </Button>
                 </MuiLink>
 
-               <MuiLink underline="none" component={Link} href="/auth/register">
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{
-                      fontWeight: 600,
-                    }}
-                  >
+                <MuiLink underline="none" component={Link} href="/auth/register">
+                  <Button fullWidth variant="contained" sx={{ fontWeight: 600 }}>
                     Register
                   </Button>
                 </MuiLink>
