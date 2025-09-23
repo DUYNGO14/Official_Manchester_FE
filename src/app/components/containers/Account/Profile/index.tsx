@@ -328,7 +328,7 @@ function ProfilePage() {
                   mb: 1
                 }}
               >
-                {user?.number || '00'}
+                {user?.number || user?.age || '00'}
               </Typography>
             </Box>
           </Box>
