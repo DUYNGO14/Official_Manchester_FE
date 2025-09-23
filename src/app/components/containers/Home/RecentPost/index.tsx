@@ -1,11 +1,20 @@
+'use client'
 import ListPost from '@/app/components/containers/Home/RecentPost/ListPost'
 import CardPostSkeleton from '@/app/components/containers/Sekeloton/CardPostSkeleton';
 import SignPost from '@/app/components/containers/signpost'
+import { getPostsAction, makeSelectPosts } from '@/app/stores/reduces/posts';
 import { IPosts } from '@/app/types/IPosts';
 import { Box, Container } from '@mui/material'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 
-function RecentPost({listPost, isCalling }: {listPost: IPosts[], isCalling: boolean}) {
+function RecentPost() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getPostsAction({}));
+  },[dispatch])
+  const {isCalling, posts } = useSelector(makeSelectPosts);
   return (
     <Box sx={{ py: { md: 3, xs:1 } }}>
       <Container maxWidth="lg">
@@ -14,7 +23,7 @@ function RecentPost({listPost, isCalling }: {listPost: IPosts[], isCalling: bool
           isCalling ? (
             <CardPostSkeleton />
           ):
-          <ListPost posts={listPost} />
+          <ListPost posts={posts as IPosts[]} />
         }
       </Container>
     </Box>

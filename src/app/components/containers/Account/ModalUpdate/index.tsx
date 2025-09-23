@@ -1,248 +1,236 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import userUpdateSchema from '@/app/components/containers/Account/ModalUpdate/validatorUser';
+import { IUser } from '@/app/types/IUser';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { CloudUpload } from '@mui/icons-material';
-import {
-  Avatar,
-  Box,
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  MenuItem,
-  styled,
-  TextField,
-  Typography
-} from '@mui/material';
+import { Avatar, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-
-interface FormData {
-  fullname: string;
-  phone_number: string;
-  address: string;
-  age: number;
-  number: string;
-  avatar: FileList | null;
-  gender: string;
-}
+import { CloudUpload } from '@mui/icons-material';
+import userUpdateSchema, { UserUpdateFormData } from '@/app/components/containers/Account/ModalUpdate/validatorUser';
+import { useDispatch, useSelector } from 'react-redux';
+import { makeSelectData, updateUserAction } from '@/app/stores/reduces/user';
 
 interface PropUpdateUser {
   open: boolean;
   onClose: () => void;
-  userData: any;
+  userData: IUser;
 }
 
-const VisuallyHiddenInput = styled('input')({
-  clip: 'rect(0 0 0 0)',
-  clipPath: 'inset(50%)',
-  height: 1,
-  overflow: 'hidden',
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  whiteSpace: 'nowrap',
-  width: 1,
-});
-
 const UpdateUserDialog = ({ open, onClose, userData }: PropUpdateUser) => {
-  const [previewAvatar, setPreviewAvatar] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState({ success: false, message: '' });
-
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting: isFormSubmitting },
+    setValue,
+    reset,
     watch,
-    reset
-  } = useForm<FormData>({
-    defaultValues: {
-      fullname: userData.fullname || '',
-      phone_number: userData.phone_number || '',
-      address: userData.address || '',
-      age: userData.age || 0,
-      number: userData.number || '',
-      avatar: userData.avatar?.url || null,
-      gender: userData.gender || ''
-    },
-    mode: 'onChange',
-    // resolver: yupResolver(userUpdateSchema)
+  } = useForm<UserUpdateFormData>({
+    resolver: yupResolver(userUpdateSchema),
   });
 
-  const handleClose = () => {
-    reset();
-    onClose();
+  const dispatch = useDispatch();
+  const { isCalling, isError, error, user } = useSelector(makeSelectData);
+
+  const [preview, setPreview] = useState<string | null>(
+    userData.avatar?.url || null
+  );
+  const [isLocalSubmitting, setIsLocalSubmitting] = useState(false);
+
+  // Watch gender value to ensure proper controlled component
+  const watchedGender = watch("gender");
+
+  // Reset form khi userData thay đổi
+  useEffect(() => {
+    reset({
+      fullname: userData.fullname || "",
+      age: userData.age || null,
+      gender: (userData.gender as "MALE" | "FEMALE" | "OTHER") || "",
+      avatar: null,
+    });
+    setPreview(userData.avatar?.url || null);
+  }, [userData, reset]);
+
+  // Handle success/error states
+  useEffect(() => {
+    if (!isCalling && !isError && isLocalSubmitting) {
+      // Success - close dialog
+      console.log("Update successful, closing dialog");
+      setIsLocalSubmitting(false);
+      // onClose();
+    } else if (!isCalling && isError && isLocalSubmitting) {
+      // Error - keep dialog open but stop submitting
+      console.log("Update failed, keeping dialog open");
+      setIsLocalSubmitting(false);
+    }
+  }, [isCalling, isError, isLocalSubmitting, onClose]);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        console.error('Please select an image file');
+        return;
+      }
+
+      setValue("avatar", file);
+      setPreview(URL.createObjectURL(file));
+    }
   };
 
-  const watchedAvatar = watch('avatar');
-
-  useEffect(() => {
-    if (watchedAvatar && watchedAvatar.length > 0) {
-      const file = watchedAvatar[0];
-      const reader = new FileReader();
-      reader.onload = (e) => setPreviewAvatar(e.target?.result as string);
-      reader.readAsDataURL(file);
-    } else {
-      setPreviewAvatar(null);
+  const handleClose = () => {
+    if (!isCalling && !isLocalSubmitting) {
+      reset();
+      setPreview(userData.avatar?.url || null);
+      setIsLocalSubmitting(false);
+      onClose();
     }
-  }, [watchedAvatar]);
+  };
 
-  const onSubmit = async (data: FormData) => {
-    setIsSubmitting(true);
+  const onSubmit = async (data: UserUpdateFormData) => {
     try {
-      // Xử lý submit ở đây
-      console.log('Form data:', data);
-      
-      // Giả lập API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setSubmitStatus({ success: true, message: 'Cập nhật thành công!' });
-      handleClose();
+      setIsLocalSubmitting(true);
+      const formData = new FormData();
+
+      // Only append fields that have changed or have values
+      if (data.fullname && data.fullname.trim() !== "" && data.fullname.trim() !== userData.fullname) {
+        formData.append("fullname", data.fullname.trim());
+      }
+
+      if (data.age && data.age > 0 && data.age !== userData.age) {
+        formData.append("age", data.age.toString());
+      }
+
+      if (data.gender !== undefined && data.gender !== null && data.gender !== userData.gender) {
+        formData.append("gender", data.gender);
+      }
+
+      // Always append avatar if a new file is selected
+      if (data.avatar && data.avatar instanceof File) {
+        formData.append("avatar", data.avatar);
+      }
+
+      // Debug: Log what we're sending
+      console.log("=== Frontend FormData ===");
+      let hasData = false;
+      for (const [key, value] of formData.entries()) {
+        hasData = true;
+        if (value instanceof File) {
+          console.log(`${key}: File(${value.name}, ${value.size}bytes, ${value.type})`);
+        } else {
+          console.log(`${key}: ${value}`);
+        }
+      }
+
+      if (!hasData) {
+        console.log("No data to update");
+        setIsLocalSubmitting(false);
+        return;
+      }
+
+      if (!isCalling) {
+        dispatch(updateUserAction({
+          id: userData._id,
+          formData
+        }));
+      } else {
+        setIsLocalSubmitting(false);
+      }
     } catch (error) {
-      setSubmitStatus({ success: false, message: 'Có lỗi xảy ra' });
-    } finally {
-      setIsSubmitting(false);
+      console.error('Update error:', error);
+      setIsLocalSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth="md" 
+      sx={{ overflow: 'hidden' }}
+      // Prevent closing while submitting
+      disableEscapeKeyDown={isCalling || isLocalSubmitting}
+    >
       <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', color: 'primary.main' }}>
         Cập nhật thông tin cá nhân
       </DialogTitle>
-      
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} id="update-user-form">
-        <DialogContent>
-          <DialogContentText sx={{ mb: 2 }}>
-            Cập nhật thông tin cá nhân của bạn. Email và tên đăng nhập không thể thay đổi.
-          </DialogContentText>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {/* Avatar Upload */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Avatar
-                src={previewAvatar || userData.avatar || ''}
-                sx={{ width: 100, height: 100, mb: 2 }}
+      <DialogContent>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+          <Stack alignItems="center" spacing={2} mb={3}>
+            <Avatar src={preview || undefined} sx={{ width: 100, height: 100 }} />
+            <Button variant="outlined" component="label" disabled={isCalling || isLocalSubmitting}>
+              <CloudUpload sx={{ mr: 1 }} />
+              Chọn ảnh mới
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleAvatarChange}
               />
-              <Button
-                component="label"
-                variant="outlined"
-                startIcon={<CloudUpload />}
-                sx={{ mb: 1 }}
-              >
-                Tải lên ảnh đại diện
-                <VisuallyHiddenInput
-                  type="file"
-                  accept="image/*"
-                  {...register('avatar')}
-                />
-              </Button>
-              {errors.avatar && (
-                <Typography color="error" variant="body2">
-                  {(errors.avatar as any)?.message}
-                </Typography>
-              )}
-            </Box>
+            </Button>
+            {errors.avatar && (
+              <Typography color="error" variant="caption">
+                {errors.avatar.message}
+              </Typography>
+            )}
+          </Stack>
 
-            {/* Fullname */}
-            <TextField
-              label="Họ và tên"
-              variant="outlined"
-              fullWidth
-              {...register('fullname')}
-              error={!!errors.fullname}
-              helperText={errors.fullname?.message}
-              placeholder="Nhập họ tên nếu muốn cập nhật"
-            />
+          <TextField
+            label="Họ và tên"
+            fullWidth
+            margin="normal"
+            disabled={isCalling || isLocalSubmitting}
+            {...register("fullname")}
+            error={!!errors.fullname}
+            helperText={errors.fullname?.message}
+          />
 
-            {/* Phone Number */}
-            <TextField
-              label="Số điện thoại"
-              variant="outlined"
-              fullWidth
-              {...register('phone_number')}
-              error={!!errors.phone_number}
-              helperText={errors.phone_number?.message}
-              placeholder="Nhập số điện thoại nếu muốn cập nhật"
-            />
+          <TextField
+            label="Tuổi"
+            fullWidth
+            type="number"
+            margin="normal"
+            inputProps={{ min: 1, max: 120 }}
+            disabled={isCalling || isLocalSubmitting}
+            {...register("age", { valueAsNumber: true })}
+            error={!!errors.age}
+            helperText={errors.age?.message}
+          />
 
-            {/* Address */}
-            <TextField
-              label="Địa chỉ"
-              variant="outlined"
-              fullWidth
-              multiline
-              rows={2}
-              {...register('address')}
-              error={!!errors.address}
-              helperText={errors.address?.message}
-              placeholder="Nhập địa chỉ nếu muốn cập nhật"
-            />
-
-            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
-              {/* Age */}
-              <TextField
-                label="Tuổi"
-                variant="outlined"
-                fullWidth
-                type="number"
-                {...register('age', { valueAsNumber: true })}
-                error={!!errors.age}
-                helperText={errors.age?.message}
-                placeholder="Tuổi"
-              />
-
-              {/* Number (0-99) */}
-              <TextField
-                label="Số (0-99)"
-                variant="outlined"
-                fullWidth
-                type="number"
-                inputProps={{ min: 0, max: 99 }}
-                {...register('number')}
-                error={!!errors.number}
-                helperText={errors.number?.message}
-                placeholder="0-99"
-              />
-            </Box>
-
-            {/* Gender */}
-            <TextField
-              label="Giới tính"
-              variant="outlined"
-              fullWidth
-              select
-              {...register('gender')}
-              error={!!errors.gender}
-              helperText={errors.gender?.message}
-              defaultValue=""
-            >
-              <MenuItem value="">Không cập nhật</MenuItem>
-              <MenuItem value="MALE">Nam</MenuItem>
-              <MenuItem value="FEMALE">Nữ</MenuItem>
-              <MenuItem value="OTHER">Khác</MenuItem>
-            </TextField>
-          </Box>
-        </DialogContent>
-
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={handleClose} color="inherit">
-            Hủy
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSubmitting}
+          <TextField
+            label="Giới tính"
+            select
+            fullWidth
+            margin="normal"
+            value={watchedGender || ""}
+            disabled={isCalling || isLocalSubmitting}
+            {...register("gender")}
+            error={!!errors.gender}
+            helperText={errors.gender?.message}
           >
-            {isSubmitting ? <CircularProgress size={24} /> : 'Cập nhật'}
-          </Button>
-        </DialogActions>
-      </Box>
+            <MenuItem value="">Chọn giới tính</MenuItem>
+            <MenuItem value="MALE">Nam</MenuItem>
+            <MenuItem value="FEMALE">Nữ</MenuItem>
+            <MenuItem value="OTHER">Khác</MenuItem>
+          </TextField>
+
+          <DialogActions sx={{ p: 0, mt: 2 }}>
+            <Button 
+              onClick={handleClose} 
+              color="inherit"
+              disabled={isCalling || isLocalSubmitting}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isCalling || isLocalSubmitting}
+            >
+              {(isCalling || isLocalSubmitting) ? <CircularProgress size={24} /> : 'Cập nhật'}
+            </Button>
+          </DialogActions>
+        </Box>
+      </DialogContent>
     </Dialog>
   );
 };

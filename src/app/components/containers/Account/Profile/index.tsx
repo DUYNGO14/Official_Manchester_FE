@@ -8,22 +8,24 @@ import StarIcon from '@mui/icons-material/Star';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import { Avatar, Box, Button, CircularProgress, Container, IconButton, Tooltip, Typography } from '@mui/material';
 import Image from 'next/image';
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, useCallback } from 'react';
+import { useSelector } from 'react-redux';
 
 function ProfilePage() {
-  const dispatch = useDispatch();
-  const { isCalling, user, isError, error } = useSelector(makeSelectData);
-  const [open, setOpen] = useState(false);
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  const { isCalling, user, isError, error, type } = useSelector(makeSelectData);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const handleOpenDialog = useCallback(() => {
+    console.log("Opening dialog");
+    setIsDialogOpen(true);
+  }, []);
 
-  if (isCalling) {
+  const handleCloseDialog = useCallback(() => {
+    console.log("Closing dialog");
+    setIsDialogOpen(false);
+  }, []);
+
+  if (isCalling && type === "getUser") {
     return (
       <Container>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
@@ -58,7 +60,7 @@ function ProfilePage() {
           backgroundColor: 'primary.main',
           borderRadius: 2,
           display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' }, // Stack on mobile, row on desktop
+          flexDirection: { xs: 'column', md: 'row' },
           justifyContent: { md: 'space-between' },
           alignItems: { xs: 'center', md: 'flex-start' },
           gap: { xs: 2, md: 3 },
@@ -223,16 +225,19 @@ function ProfilePage() {
                 <Logout sx={{ fontSize: { xs: '1.2rem', md: '1.5rem' } }} />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Settings" onClick={handleClickOpen}>
-              <IconButton sx={{
-                color: 'secondary.contrastText',
-                '&:hover': {
-                  color: 'primary.main',
-                  backgroundColor: 'white'
-                },
-                transition: 'all 0.3s ease-in-out',
-                p: { xs: 0.5, md: 1 }
-              }}>
+            <Tooltip title="Settings">
+              <IconButton 
+                onClick={handleOpenDialog}
+                sx={{
+                  color: 'secondary.contrastText',
+                  '&:hover': {
+                    color: 'primary.main',
+                    backgroundColor: 'white'
+                  },
+                  transition: 'all 0.3s ease-in-out',
+                  p: { xs: 0.5, md: 1 }
+                }}
+              >
                 <Settings sx={{ fontSize: { xs: '1.2rem', md: '1.5rem' } }} />
               </IconButton>
             </Tooltip>
@@ -403,7 +408,15 @@ function ProfilePage() {
           </Box>
         </Box>
       </Box>
-      {open && <DialogUpdateUser open={open}  onClose={handleClose} userData={user}  />}
+      
+      {/* Dialog component - only render when needed */}
+      {isDialogOpen && user && (
+        <DialogUpdateUser 
+          open={isDialogOpen}
+          onClose={handleCloseDialog}
+          userData={user}
+        />
+      )}
     </Container>
   );
 }

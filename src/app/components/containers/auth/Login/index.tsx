@@ -66,12 +66,11 @@ function Login() {
       dispatch(loginAction(data));
     }
   };
-  // useEffect(() => {
-  //   console.log("login.isSuccess", login.isSuccess);
-  //   if (login.isSuccess) {
-  //     router.push("/");
-  //   }
-  // }, [login.isSuccess, router]);
+  useEffect(() => {
+    if (login.isSuccess) {
+      router.push("/");
+    }
+  }, [login.isSuccess, router]);
 
   return (
     // Component chính

@@ -10,18 +10,14 @@ import {
   Box,
   Button,
   Container,
-  Menu,
-  MenuItem,
   Link as MuiLink,
   Skeleton,
   Toolbar,
-  Typography,
+  Typography
 } from '@mui/material';
 import clsx from 'clsx';
-import { is } from 'date-fns/locale';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 const HeaderDesktop = ({ user, isCalling, pathname, handleLogout }: HeaderProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

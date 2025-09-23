@@ -1,11 +1,8 @@
+import HomePlayers from '@/app/components/containers/Players/HomePlayers'
 import React from 'react'
 
-function Player() {
+export default function Players() {
   return (
-    <div>
-      Player
-    </div>
+   <HomePlayers />
   )
 }
-
-export default Player

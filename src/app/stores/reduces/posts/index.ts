@@ -8,7 +8,10 @@ export interface Pagination {
   limit: number;
   total: number;
   totalPage: number;
+  sort?: string;
+  orderBy?: string;
 }
+
 export interface PostState {
   isCalling: boolean;
   isSuccess: boolean;
@@ -16,7 +19,7 @@ export interface PostState {
   isError: boolean;
   error: any;
   post: IPosts | null;
-  posts: IPosts[] | null;
+  posts: IPosts[];
   param: any;
   pagination: Pagination | null;
   type: string;
@@ -67,6 +70,7 @@ export const postSlice = createSlice({
         type: string;
         data: any;
         pagination?: Pagination;
+        param?: any;
       }>
     ) => {
       state.isCalling = false;
@@ -75,17 +79,31 @@ export const postSlice = createSlice({
       state.isError = false;
       state.error = null;
       state.type = action.payload.type;
+
       switch (action.payload.type) {
-        case "getPosts":
-          state.posts = state.posts
-            ? [...state.posts, ...action.payload.data]
-            : action.payload.data;
-          state.pagination = action.payload.pagination ?? null;
+        case "getPosts": {
+          const { pagination, data, param } = action.payload;
+          const prevParam = state.param;
+
+          // Kiểm tra sort/orderBy có thay đổi không
+          const isSameSort =
+            prevParam?.sort === param?.sort &&
+            prevParam?.orderBy === param?.orderBy;
+
+          if (param?.page > 1 && isSameSort) {
+            // Load more & sort/orderBy không đổi => append
+            state.posts = [...state.posts, ...data];
+          } else {
+            // Lần đầu / đổi sort/orderBy => reset
+            state.posts = data;
+          }
+
+          state.pagination = pagination ?? null;
+          state.param = param;
           break;
+        }
         case "getPostDetail":
-          state.post = action.payload.data;
-          break;
-        default:
+          state.post = action.payload.data as unknown as IPosts;
           break;
       }
     },
@@ -100,20 +118,14 @@ export const postSlice = createSlice({
       state.type = action.payload.type;
     },
     reset: (state) => {
-      state.isCalling = false;
-      state.isSuccess = false;
-      state.isError = false;
-      state.error = null;
-      state.post = null;
-      state.posts = [];
-      state.param = null;
-      state.type = "";
+      Object.assign(state, initialState);
     },
     resetMatch: (state) => {
       state.post = null;
     },
   },
 });
+
 export const {
   getPostsAction,
   getPostDetailAction,
@@ -127,25 +139,22 @@ export const postReducer = postSlice.reducer;
 
 const selectState = (state: RootState) => state.posts;
 
-export const makeSelectPosts = createSelector(
-  selectState,
-  (state: PostState) => {
-    return {
-      posts: state.posts,
-      isCalling: state.isCalling,
-      isSuccess: state.isSuccess,
-      isError: state.isError,
-      error: state.error,
-      pagination: state.pagination,
-    }
-  }
-);
+export const makeSelectPosts = createSelector(selectState, (state: PostState) => ({
+  posts: state.posts,
+  post: state.post,
+  isCalling: state.isCalling,
+  isSuccess: state.isSuccess,
+  isError: state.isError,
+  error: state.error,
+  pagination: state.pagination,
+}));
+
 export const makeSelectListPosts = createSelector(
   selectState,
   (state: PostState) => state.posts || []
 );
 
-export const makeSelectPostDetail= createSelector(
+export const makeSelectPostDetail = createSelector(
   selectState,
   (state: PostState) => state.post || null
 );

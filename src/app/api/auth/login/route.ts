@@ -11,6 +11,7 @@ export async function POST(request: Request) {
 
     // Gọi API login phía backend
     const res: any = await post("/auth/login", body);
+    console.log("res api login", res);
 
     if (!res || res?.code >= 400) {
       const message = res?.message || "Authentication failed";
@@ -63,6 +64,7 @@ export async function POST(request: Request) {
     }
     return Response.json(res);
   } catch (error: any) {
+    console.error("Error login route:", error);
 
     return Response.json(
       {

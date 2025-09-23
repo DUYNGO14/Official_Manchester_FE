@@ -11,5 +11,6 @@ const get = (...args: Parameters<typeof serverAjax.get>) => serverAjax.get(...ar
 const post = (...args: Parameters<typeof serverAjax.post>) => serverAjax.post(...args);
 const put = (...args: Parameters<typeof serverAjax.put>) => serverAjax.put(...args);
 const del = (...args: Parameters<typeof serverAjax.delete>) => serverAjax.delete(...args);
-export { get, post, put, del };
+const patch = (...args: Parameters<typeof serverAjax.patch>) => serverAjax.patch(...args);
+export { get, post, put, del, patch };
 export default serverAjax;

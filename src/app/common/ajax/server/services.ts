@@ -44,10 +44,6 @@ class ServerService extends AxiosCommon {
             process.env.COOKIE_REFRESH_TOKEN_NAME! || "refresh_token"
           )?.value;
 
-          console.log("===========================================");
-          console.log("token", token);
-          console.log("refreshToken", refreshToken);
-          console.log("===========================================");
           if (!token && refreshToken) {
             token = (await refreshTokenHandler()) as string;
           }
@@ -59,12 +55,15 @@ class ServerService extends AxiosCommon {
         const headerLst = await headers();
         config.withCredentials = true; // để gửi cookie refreshToken
         config.headers["User-Agent"] = headerLst.get("User-Agent");
-        config.headers["Content-Type"] = "application/json";
         config.headers["address-ip"] = headerLst.get("cf-connecting-ip");
         config.headers["x-forwarded-for"] =
           headerLst.get("x-forwarded-for") ||
           headerLst.get("connection.remoteAddress");
-
+        if(!(config.data instanceof FormData)){
+          config.headers["Content-Type"] = "application/json";
+        }else{
+          delete config.headers["Content-Type"];
+        }
         return config;
       },
       (error) => Promise.reject(error)
@@ -81,9 +80,9 @@ class ServerService extends AxiosCommon {
         return data;
       },
       async (error: any) => {
+        console.log("Error server", error.response.data);
         const status = error?.response?.status || error?.status;
         const originalRequest = error.config;
-
         // lấy path
         const urlPath = new URL(
           originalRequest.url,
@@ -124,11 +123,15 @@ class ServerService extends AxiosCommon {
           await logoutAction();
         }
 
-        return Promise.reject({
-          code: status || error.code || 500,
-          message: error.message,
-          data: error?.response?.data,
-        });
+        if (error.response) {
+          return Promise.resolve({
+            code: status || error.response.data?.code || 500,
+            message: error.response.data?.message || "Request failed",
+            data: error?.response?.data.error || error?.data || error,
+          });
+        }
+
+        return Promise.reject(error);
       }
     );
   }
@@ -179,12 +182,6 @@ async function refreshTokenAction(): Promise<string | null> {
     const cookieHeader = `${refreshTokenCookie.name}=${refreshTokenCookie.value}`;
 
     const endpoint = `${process.env.CORE_API_DOMAIN}/${CORE_CHECK_REFRESH_TOKEN_ENDPOINT}`;
-    // Trong refreshTokenAction
-    console.log("Refresh token cookie details:", {
-      name: process.env.COOKIE_REFRESH_TOKEN_NAME,
-      value: refreshTokenCookie?.value ? "exists" : "missing",
-      length: refreshTokenCookie?.value?.length,
-    });
 
     console.log("Endpoint:", endpoint);
     const respToken = await axios.post(
@@ -200,9 +197,6 @@ async function refreshTokenAction(): Promise<string | null> {
         },
       }
     );
-    console.log("Refresh token response status:", respToken.status);
-    console.log("Refresh token response data:", respToken.data);
-    console.log("===============Refresh token===============", respToken);
 
     if (respToken?.data?.data?.accessToken) {
       // update cookie
@@ -251,12 +245,12 @@ async function refreshTokenAction(): Promise<string | null> {
       return respToken.data.data.accessToken;
     }
     return null;
-  } catch (error :any) {
+  } catch (error: any) {
     console.error("Refresh token error details:", {
       status: error.response?.status,
       data: error.response?.data, // ← QUAN TRỌNG: xem server trả về gì
       message: error.message,
-      headers: error.response?.headers
+      headers: error.response?.headers,
     });
     return null;
   }

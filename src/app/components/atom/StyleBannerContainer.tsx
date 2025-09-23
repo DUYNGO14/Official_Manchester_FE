@@ -1,3 +1,4 @@
+'use client';
 import { Box, styled } from "@mui/material";
 
 interface StyleBannerContainerProps {
@@ -9,7 +10,7 @@ const StyleBannerContainer = styled(Box, {
 })<StyleBannerContainerProps>(({ theme, backgroundImage }) => ({
   position: 'relative',
   height: '80vh',
-  background: `linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%), url(${backgroundImage})`,
+  background: `linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 100%), url(${backgroundImage})`,
   backgroundSize: 'cover',
   backgroundPosition: 'top center',
   display: 'flex',

@@ -3,12 +3,15 @@ export interface IUser {
   fullname: string;
   username: string;
   email: string;
+  age: number;
+  gender: string;
   accountType: string;
   createdAt: string;
   updatedAt: string;
   avatar?: IAvatar | null;
   number?: string
 }
+
 
 export interface IAvatar {
   url: string;

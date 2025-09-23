@@ -1,11 +1,7 @@
-import React from 'react'
+import PostPage from "@/app/components/containers/Posts/PostPage";
 
-function Posts() {
+export default function Posts() {
   return (
-    <div>
-      Post
-    </div>
+   <PostPage/>
   )
 }
-
-export default Posts

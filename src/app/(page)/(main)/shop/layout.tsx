@@ -1,5 +1,4 @@
 
-import { Box } from "@mui/material";
 import { Metadata } from "next";
 export const metadata : Metadata = {
   title: "Shop Page",
@@ -7,8 +6,8 @@ export const metadata : Metadata = {
 };
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <Box>
+    <div>
       {children}
-    </Box>
+    </div>
   );
 }

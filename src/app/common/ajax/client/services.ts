@@ -1,18 +1,21 @@
-import AxiosCommon , { AxiosOptions} from "../Axios";
+import AxiosCommon, { AxiosOptions } from "../Axios";
 
 class ClientService extends AxiosCommon {
   constructor(options: AxiosOptions) {
     super(options);
     this.axiosInstance.interceptors.response.use(
       async (response) => {
-        return {...response.data, code: response.status};
+        console.log("Response client", response);
+        return { ...response.data, code: response.status };
       },
       async function (error) {
-        return {
-          code: error.response.status ||error.response.data?.code || 500,
-          message: error.response.data?.message || "Request failed",
-          data: error?.response?.data.errors || error?.data || error,
-        };
+        console.log("Error client", error.response);
+        return Promise.reject({
+          code: error.response?.status || error.response?.data?.code || 500,
+          message: error.response?.data?.message || "Request failed",
+          data: error?.response?.data?.errors || error?.data || error,
+          error: error,
+        });
       }
     );
   }

@@ -9,9 +9,7 @@ export interface AxiosOptions {
 interface ApiResponse<T = unknown> {
   message: string | string[];
   data?: T | null;
-  error?: unknown|null;
   code: number;
-  success?: boolean;
 }
 
 interface RequestOptions<Req = unknown> {
@@ -85,6 +83,14 @@ class AxiosCommon {
     options: Partial<RequestOptions> = {}
   ): Promise<AxiosResponse<ApiResponse<Resp>>> {
     return this.request<Resp>({ url, method: METHOD.DELETE, params }, options);
+  }
+
+  public patch<Resp = unknown, Req = unknown>(
+    url: string,
+    data: Req,
+    options: Partial<RequestOptions> = {}
+  ): Promise<AxiosResponse<ApiResponse<Resp>>> {
+    return this.request<Resp, Req>({ url, method: METHOD.PATCH, data }, options);
   }
 }
 

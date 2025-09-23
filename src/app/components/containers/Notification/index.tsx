@@ -12,6 +12,7 @@ const Notification = () => {
 
   return (
     <Snackbar
+      key={severity}
       open={open}
       autoHideDuration={3000}
       onClose={() => dispatch(hideNotification())}

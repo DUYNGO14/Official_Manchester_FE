@@ -1,4 +1,6 @@
-import { styled } from "@mui/material";
+'use client';
+
+import { styled } from '@mui/material/styles';
 
 const StyleTeamLogo = styled('div')({
   width: '120px',

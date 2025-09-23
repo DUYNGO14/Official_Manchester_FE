@@ -34,5 +34,11 @@ const del = <Resp = unknown>(
   options?: object
 ): Promise<any> => clientAxios.delete<Resp>(url, params, options);
 
-export { get, post, put, del };
+const patch = <Resp = unknown, Req = unknown>(
+  url: string,
+  data?: Req,
+  options?: object
+): Promise<any> => clientAxios.patch<Resp, Req>(url, data as Req, options);
+
+export { get, post, put, del, patch };
 export default clientAxios;

@@ -75,15 +75,17 @@ export function Footer() {
   return (
     <Box
       component="footer"
-      sx={{
+      display={'flex'}
+      flexDirection={'column'}
+    >
+      <Box sx={{ backgroundImage: 'url(/taitro.png)', backgroundSize: 'cover', backgroundPosition: 'center' , width: '100%', height: '200px' }}>
+        
+      </Box>
+      <Box sx={{
         backgroundColor: 'grey.800',
         color: 'white',
         py: 3,
-        mt: 3,
-
-      }}
-    >
-      <Container maxWidth="lg">
+      }}>
         <Stack direction="row" spacing={{ sx: 2, md: 4 }} display={'flex'} justifyContent={'center'} >
           {
             socialLinks.map((link, index) => (
@@ -92,10 +94,10 @@ export function Footer() {
                 aria-label={link.label}
                 sx={{
                   color: 'white',
-                  transition: 'all 0.3s ease-in-out',  
+                  transition: 'all 0.3s ease-in-out',
                   '&:hover': {
                     backgroundColor: 'primary.main',
-                    transform: 'translateY(-10px)',    
+                    transform: 'translateY(-10px)',
                   },
                 }}
               >
@@ -111,7 +113,7 @@ export function Footer() {
             Copyright © 2023 Manchester United Fan Page.
           </Typography>
         </Stack>
-      </Container>
+      </Box>
     </Box>
   );
 }

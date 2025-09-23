@@ -64,7 +64,7 @@ function* callApiLogin(
 
     yield put(loginError(errorMessage));
     yield put(
-      showNotification({ message: "Something went wrong", severity: "error" })
+      showNotification({ message: errorMessage, severity: "error" })
     );
   }
 }
@@ -107,7 +107,7 @@ function* callApiRegister(
 
     yield put(registerError(errorMessage));
     yield put(
-      showNotification({ message: "Something went wrong", severity: "error" })
+      showNotification({ message: errorMessage, severity: "error" })
     );
   }
 }
@@ -152,7 +152,6 @@ function* callApiLogout(): Generator<any, void, unknown> {
     );
   } finally {
     yield put(logoutSuccess());
-    window.location.href = "/auth/login";
   }
 }
 
