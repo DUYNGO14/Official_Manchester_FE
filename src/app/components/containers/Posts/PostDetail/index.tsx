@@ -1,10 +1,10 @@
 'use client'
 import NewsBanner from '@/app/components/containers/Banner/NewsBanner';
+import HeaderBack from '@/app/components/containers/Header/HedearBack';
 import Loading from '@/app/components/containers/Loading';
 import HeaderPost from '@/app/components/containers/Posts/PostDetail/HeaderPost';
 import { getPostDetailAction, makeSelectPosts } from '@/app/stores/reduces/posts';
 import {
-  ArrowBack,
   BookmarkBorder,
   Share,
   Visibility
@@ -19,13 +19,11 @@ import {
   Stack,
   Typography
 } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 function Detail({ slug }: { slug: string }) {
   const dispatch = useDispatch();
-  const router = useRouter();
   useEffect(() => {
     dispatch(getPostDetailAction({ slug }));
   }, [dispatch, slug]);
@@ -42,13 +40,7 @@ function Detail({ slug }: { slug: string }) {
     return views.toString();
   };
 
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      router.back();
-    } else {
-      router.push('/'); // fallback về Home nếu không có trang trước
-    }
-  };
+
 
   // Format content with paragraphs
   const formatContent = (content: string) => {
@@ -85,7 +77,7 @@ function Detail({ slug }: { slug: string }) {
     return <Loading />;
   }
 
-  if (!isCalling &&!post) {
+  if (!isCalling && !post) {
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
         <Typography variant="h4" color="error" gutterBottom>
@@ -109,20 +101,7 @@ function Detail({ slug }: { slug: string }) {
       />
 
       <Container maxWidth="lg" sx={{ pt: { xs: 2, md: 4 }, pb: { xs: 6, md: 8 } }}>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="start"
-          gap={1}
-          sx={{ mb: 2 }}
-        >
-          <IconButton size="small" onClick={handleBack} sx={{ color: 'text.primary' , '&:hover': { color: 'primary.main' }}}> 
-            <ArrowBack />
-            <Typography variant="body2">Quay lại</Typography>
-          </IconButton>
-        </Stack>
-
-
+        <HeaderBack />
         <Box display="flex" gap={4}>
           <Box flex={1}>
             <Paper

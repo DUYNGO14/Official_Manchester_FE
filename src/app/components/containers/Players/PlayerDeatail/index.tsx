@@ -11,6 +11,7 @@ import LightTooltip from '@/app/components/atom/StyleTooltips';
 import { getPlayerAction, makeSelectData } from '@/app/stores/reduces/player';
 import { IPlayer } from '@/app/types/IPlayer';
 import { calcAge } from '@/app/common/utils/calcAge';
+import HeaderBack from '@/app/components/containers/Header/HedearBack';
 
 // Constants
 const STAT_STYLES = {
@@ -48,11 +49,11 @@ const NAVIGATION_STYLES = {
 };
 
 // Memoized components
-const NavigationButton = memo(({ 
-  direction, 
-  player, 
-  onClick, 
-  disabled 
+const NavigationButton = memo(({
+  direction,
+  player,
+  onClick,
+  disabled
 }: {
   direction: 'prev' | 'next';
   player?: IPlayer;
@@ -297,29 +298,32 @@ export default function DetailPlayer() {
   }
 
   return (
-    <Box className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 relative overflow-hidden w-full">
-      {/* Navigation Arrows */}
-      <NavigationButton
-        direction="prev"
-        player={prevPlayer}
-        onClick={handlePrevious}
-        disabled={!prevPlayer}
-      />
-      <NavigationButton
-        direction="next"
-        player={nextPlayer}
-        onClick={handleNext}
-        disabled={!nextPlayer}
-      />
+    <Box className="relative mt-2">
+      <HeaderBack />
+      <Box className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 relative overflow-hidden w-full">
+        {/* Navigation Arrows */}
+        <NavigationButton
+          direction="prev"
+          player={prevPlayer}
+          onClick={handlePrevious}
+          disabled={!prevPlayer}
+        />
+        <NavigationButton
+          direction="next"
+          player={nextPlayer}
+          onClick={handleNext}
+          disabled={!nextPlayer}
+        />
 
-      {/* Main Content Container */}
-      <Box className="h-screen flex items-center justify-between px-8 lg:px-16">
-        <PlayerInfo player={currentPlayer} />
-        <PlayerImage player={currentPlayer} />
-        <PlayerStats player={currentPlayer} />
+        {/* Main Content Container */}
+        <Box className="h-screen flex items-center justify-between px-8 lg:px-16">
+          <PlayerInfo player={currentPlayer} />
+          <PlayerImage player={currentPlayer} />
+          <PlayerStats player={currentPlayer} />
+        </Box>
+
+        <BackgroundPattern />
       </Box>
-
-      <BackgroundPattern />
     </Box>
   );
 }

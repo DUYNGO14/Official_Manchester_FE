@@ -4,16 +4,14 @@
 import CardMatch from '@/app/components/containers/Matches/CardMatch';
 import {
   KeyboardArrowLeft,
-  KeyboardArrowRight,
-  PlayArrow,
-  Pause,
+  KeyboardArrowRight
 } from '@mui/icons-material';
 import {
   Box,
   IconButton,
+  Typography,
   useMediaQuery,
   useTheme,
-  Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -63,15 +61,6 @@ const CardMatchCarousel = ({ matches }: { matches: any[] }) => {
       prevIndex === 0 ? maxIndex : prevIndex - 1
     );
     setAutoPlay(false);
-  };
-
-  const handleDotClick = (index: number) => {
-    setActiveIndex(index);
-    setAutoPlay(false);
-  };
-
-  const toggleAutoPlay = () => {
-    setAutoPlay(prev => !prev);
   };
 
   // Don't show carousel if there are no matches
