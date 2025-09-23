@@ -3,7 +3,7 @@
 import { get, patch } from "@/app/common/ajax/client";
 import { showNotification } from "@/app/stores/reduces/notification";
 import { getUserAction, getUserError, getUserSuccess, updateUserAction, updateUserError, updateUserSuccess } from "@/app/stores/reduces/user";
-import { IUser } from "@/app/types/IUser";
+import { IUser, IUserUpdatePayload } from "@/app/types/IUser";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, takeLatest } from "redux-saga/effects";
 
@@ -49,13 +49,28 @@ function* callApiGetProfile(action: PayloadAction<{ id: string } | undefined>): 
 }
 
 
-function* updateProfileUser(action: PayloadAction<{ id: string, formData: FormData }>): Generator<any, void, unknown> {
+function* updateProfileUser(
+  action: PayloadAction<{ id: string; data: IUserUpdatePayload }>
+): Generator<any, void, unknown> {
   try {
-    const payload = action.payload;
+    const { id, data } = action.payload;
 
-    // Debug: Log FormData contents
+    const formData = new FormData();
+    if (data.fullname && data.fullname.trim() !== "") {
+      formData.append("fullname", data.fullname.trim());
+    }
+    if (data.age && data.age > 0) {
+      formData.append("age", data.age.toString());
+    }
+    if (data.gender) {
+      formData.append("gender", data.gender);
+    }
+    if (data.avatar instanceof File) {
+      formData.append("avatar", data.avatar);
+    }
+
     console.log("=== Saga FormData ===");
-    for (const [key, value] of payload.formData.entries()) {
+    for (const [key, value] of formData.entries()) {
       if (value instanceof File) {
         console.log(`${key}: File(${value.name}, ${value.size}bytes, ${value.type})`);
       } else {
@@ -63,23 +78,14 @@ function* updateProfileUser(action: PayloadAction<{ id: string, formData: FormDa
       }
     }
 
-    const response: any = yield call(patch, `/users/update/${payload.id}`, payload.formData);
+    const response: any = yield call(patch, `/users/update/${id}`, formData);
 
-    console.log("=== Saga Response ===", response);
-
-    // Handle different response formats
     if (response && (response.code === 200 || response.status === 200)) {
       const userData = response.data || response;
       const formattedData = formatUser(userData);
       yield put(updateUserSuccess(formattedData));
-      yield put(
-        showNotification({
-          message: "Update successfully",
-          severity: "success",
-        })
-      );
+      yield put(showNotification({ message: "Update successfully", severity: "success" }));
     } else {
-      // Handle error response
       const errorMessage = response?.message || response?.data?.message || "Update failed";
       yield put(updateUserError(errorMessage));
       yield put(showNotification({ message: errorMessage, severity: "error" }));
@@ -88,8 +94,6 @@ function* updateProfileUser(action: PayloadAction<{ id: string, formData: FormDa
     console.error("=== Saga Error ===", error);
 
     let errorMessage = "Update user failed";
-
-    // Handle axios error
     if (error.response?.data?.message) {
       errorMessage = error.response.data.message;
     } else if (error.message) {

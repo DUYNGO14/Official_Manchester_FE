@@ -12,6 +12,12 @@ export interface IUser {
   number?: string
 }
 
+export interface IUserUpdatePayload {
+  fullname?: string;
+  age?: number;
+  gender?: string;
+  avatar?: File | null;
+}
 
 export interface IAvatar {
   url: string;

@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+'use client';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import LogoutIcon from '@mui/icons-material/Logout';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import SettingsIcon from '@mui/icons-material/Settings';
-import LogoutIcon from '@mui/icons-material/Logout';
 
 // Better type definitions
 interface DropDownProps {
@@ -23,10 +23,9 @@ interface MenuItem {
 const DropDown: React.FC<DropDownProps> = ({
   anchorEl,
   handleMenuClose,
-  handleLogout
+  handleLogout,
 }) => {
   const router = useRouter();
-
   const listMenu: MenuItem[] = [
     {
       title: 'Profile',

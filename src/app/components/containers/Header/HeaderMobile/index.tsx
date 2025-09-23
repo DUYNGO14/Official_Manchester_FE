@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import { HeaderProps } from '@/app/components/containers/Header';
 import DropDown from '@/app/components/containers/Header/DropDown';
 import { ROUTE_LIST } from '@/app/components/containers/Header/router';
+import { logoutAction, makeSelectAuth } from '@/app/stores/reduces/auth';
+import { makeSelectUser, makeSelectUserIsCalling } from '@/app/stores/reduces/user';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
@@ -15,27 +15,38 @@ import {
   List,
   ListItem,
   ListItemText,
+  Link as MuiLink,
   Skeleton,
   Toolbar,
   Typography,
-  Link as MuiLink,
 } from '@mui/material';
+import clsx from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-const HeaderMobile = ({
-  user,
-  isCalling,
-  pathname,
-  handleLogout,
-}: HeaderProps) => {
+const HeaderMobile = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
+  const dispatch = useDispatch();
+  const router = useRouter();
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+  const user = useSelector(makeSelectUser);
+  const isCalling = useSelector(makeSelectUserIsCalling);
+  const pathname = usePathname();
+  const handleLogout = () => {
+    dispatch(logoutAction());
+  };
+  const { isSuccess } = useSelector(makeSelectAuth);
+  useEffect(() => {
+    if (isSuccess) {
+      router.push('/auth/login');
+    }
+  })
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -100,6 +111,7 @@ const HeaderMobile = ({
                   key={item.name}
                   component={Link}
                   href={item.path}
+                  className={clsx({ active: pathname === item.path })}
                   onClick={() => setDrawerOpen(false)}
                   sx={{
                     borderRadius: 1,

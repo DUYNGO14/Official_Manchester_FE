@@ -91,7 +91,7 @@ const FootballMatchBanner = ({ matchData, image }: Props) => {
                   fontSize: { xs: '2rem', md: '3rem' }
                 }}
               >
-                VS
+                2 - 1
               </Typography>
             </div>
 

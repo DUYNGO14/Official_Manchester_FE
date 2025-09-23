@@ -14,8 +14,6 @@ export async function GET(request: Request) {
       nationality
     };
 
-    console.log("param", param);
-
     const response: any = await get("/players", param);
     if (response?.code >= 400) {
       return NextResponse.json(

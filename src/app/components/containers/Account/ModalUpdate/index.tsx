@@ -108,8 +108,6 @@ const UpdateUserDialog = ({ open, onClose, userData }: PropUpdateUser) => {
         formData.append("avatar", data.avatar);
       }
 
-      // Debug: Log what we're sending
-      console.log("=== Frontend FormData ===");
       let hasData = false;
       for (const [key, value] of formData.entries()) {
         hasData = true;
@@ -121,7 +119,6 @@ const UpdateUserDialog = ({ open, onClose, userData }: PropUpdateUser) => {
       }
 
       if (!hasData) {
-        console.log("No data to update");
         setIsLocalSubmitting(false);
         return;
       }
@@ -129,7 +126,12 @@ const UpdateUserDialog = ({ open, onClose, userData }: PropUpdateUser) => {
       if (!isCalling) {
         dispatch(updateUserAction({
           id: userData._id,
-          formData
+          data: {
+            fullname: data.fullname,
+            age: data.age,
+            gender: data.gender,
+            avatar: data.avatar, 
+          }
         }));
       } else {
         setIsLocalSubmitting(false);
@@ -141,10 +143,10 @@ const UpdateUserDialog = ({ open, onClose, userData }: PropUpdateUser) => {
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose} 
-      maxWidth="md" 
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="md"
       sx={{ overflow: 'hidden' }}
       // Prevent closing while submitting
       disableEscapeKeyDown={isCalling || isLocalSubmitting}
@@ -214,8 +216,8 @@ const UpdateUserDialog = ({ open, onClose, userData }: PropUpdateUser) => {
           </TextField>
 
           <DialogActions sx={{ p: 0, mt: 2 }}>
-            <Button 
-              onClick={handleClose} 
+            <Button
+              onClick={handleClose}
               color="inherit"
               disabled={isCalling || isLocalSubmitting}
             >

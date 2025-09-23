@@ -47,7 +47,7 @@ export default function PlayerCard({ player }: PlayerCardProps) {
             left: 0,
             width: "100%",
             p: 2,
-            background: "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0))",
+            background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%,  rgba(0,0,0,0.6) 70%, rgba(0,0,0,0) 100%)",
           }}
         >
           <Box sx={{ display: "flex", justifyContent: "start", gap: 2 }}>

@@ -1,3 +1,4 @@
+'use client';
 import { getUserAction } from "@/app/stores/reduces/user";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";

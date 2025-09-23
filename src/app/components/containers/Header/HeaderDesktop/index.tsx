@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-
-import { HeaderProps } from '@/app/components/containers/Header';
 import DropDown from '@/app/components/containers/Header/DropDown';
 import { ROUTE_LIST } from '@/app/components/containers/Header/router';
+import { logoutAction, makeSelectAuth } from '@/app/stores/reduces/auth';
+import { makeSelectUser, makeSelectUserIsCalling } from '@/app/stores/reduces/user';
 import {
   AppBar,
   Avatar,
@@ -18,13 +17,28 @@ import {
 import clsx from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
-const HeaderDesktop = ({ user, isCalling, pathname, handleLogout }: HeaderProps) => {
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+const HeaderDesktop = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
+  const router = useRouter();
+  const user = useSelector(makeSelectUser);
+  const dispatch = useDispatch();
+  const isCalling = useSelector(makeSelectUserIsCalling);
+  const pathname = usePathname();
+  const handleLogout = () => {
+    dispatch(logoutAction());
+  };
+  const {isSuccess} = useSelector(makeSelectAuth);
+  useEffect(() => {
+    if(isSuccess){
+      router.push('/auth/login');
+    }
+  })
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
@@ -61,7 +75,7 @@ const HeaderDesktop = ({ user, isCalling, pathname, handleLogout }: HeaderProps)
             {ROUTE_LIST.map((item) => (
 
               <MuiLink component={Link} href={item.path} key={item.path}
-                className={clsx({ active: pathname === item.path })}
+                className={clsx({ active: pathname?.startsWith(item.path) })}
                 underline="none"
               >
                 {item.name}
